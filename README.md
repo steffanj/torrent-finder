@@ -13,9 +13,9 @@ If you don't want to run the interactive main script, you can run 'results = tor
 * size: approx. file size in MB, integer
 * proper: True if the search result contains the words 'proper' or 'repack'; False otherwise, boolean
 * seeds: number of seeds, integer
-* age: age or post date as provided by search engine (raw)
-* magnet: magnet link
-* torrent: link to .torrent file
+* age: age or post date as provided by search engine (raw), string
+* magnet: magnet link, string
+* torrent: link to .torrent file, string
 
 ## To do
 - [ ] Test/make work on Apple and Ubuntu machines
