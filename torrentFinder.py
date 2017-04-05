@@ -24,9 +24,9 @@ retrieve a dictionary containing the following information of each search result
 * size: approx. file size in MB, integer
 * proper: True if the search result contains the words 'proper' or 'repack'; False otherwise, boolean
 * seeds: number of seeds, integer
-* age: age or post date as provided by search engine (raw), string
-* magnet: magnet link, string
-* torrent: link to .torrent file, string
+* age: age or post date as provided by search engine (raw)
+* magnet: magnet link
+* torrent: link to .torrent file
 
 # To do
 - [ ] Test/make work on Apple and Ubuntu machines
@@ -73,9 +73,9 @@ def main():
             else:
                 # Opening magnet link with default application on machine
                 print("\nOpening '{}', {} MB in your default torrent application".format(
-                        results['title'].iloc[choice_dl], 
-                        results['size'].iloc[choice_dl]))
-                os.startfile(results['magnet'].iloc[choice_dl])
+                        results['title'].loc[choice_dl], 
+                        results['size'].loc[choice_dl]))
+                os.startfile(results['magnet'].loc[choice_dl])
         print('Handled all queries.')
     
         # Ask if user wants to do another search
