@@ -10,7 +10,7 @@ An example for the free ['Zeitgeist Addendum' movie](http://www.zeitgeistmovie.c
 If you don't want to run the interactive main script, you can run 'results = torrentFinder.getResults(query)' on a string search query to retrieve a dictionary containing the following information of each search result: 
 * source: source (search engine), string
 * title: torrent title, string
-* size: approx. file size in MB, integer
+* size: approx. file size including unit (MB, GB), string
 * proper: True if the search result contains the words 'proper' or 'repack'; False otherwise, boolean
 * seeds: number of seeds, integer
 * age: age or post date as provided by search engine (raw), string
