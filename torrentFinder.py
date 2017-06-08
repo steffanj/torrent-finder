@@ -50,12 +50,11 @@ def main():
     
     stop_flag = False
     while stop_flag == False:
-        # Ask for the search terms
-        queries = input('What would you like to search for?\nSeparate multiple' 
-                        ' search terms with a comma:\n').split(',')
-        queries = list(map(str.strip, queries))
+        # Ask for the search terms and process query/queries
+        queries_processed = queryProcessing(input('What would you like to search for?\nSeparate multiple' 
+                        ' search terms with a comma:\n').split(','))
         # Call the method to actually retrieve torrent info for each query
-        for query in queries:
+        for query in queries_processed:
             results = getResults(query)
             
             # The DataFrame might be too wide for pandas to print neatly by 
@@ -123,17 +122,56 @@ def getResults(query):
         if except_cntr>0: print('{} possible search results could not be parsed'.format(except_cntr))
         
     
-    # Sort values on (1) size, (2) whether the result contains the words 'proper'
-    # or 'repacked', (3) number of seeds. If you are looking for large-sized
-    # results (HD files), the first result after sorting is often the one
-    # you wish to obtain
-    results['size'] = pd.to_numeric(results['size'], downcast='integer')
+    # Sort values on (1) number of seeds and (2) whether the result contains 
+    # the words 'proper' or 'repacked'
     results['seeds'] = pd.to_numeric(results['seeds'], downcast='integer')
-    results.sort_values(['size','proper', 'seeds'], axis=0, ascending=[False,False,False], inplace=True)
+    results.sort_values(['seeds', 'proper'], axis=0, ascending=[False,False], inplace=True)
     results['no.']=np.arange(1, results.shape[0]+1)
     results.set_index('no.',inplace=True)
 
     # Return the results DataFrame
     return results  
+
+def queryProcessing(queries):
+    # Users can specify multiple episodes to search for using the format
+    # 'TVSHOW S01E01-05' or 'TVSHOW S01E01-E05' to search for episodes 1, 2, 3, 
+    # 4 and 5 of season 1 of show TVSHOW
+    import re
+    queries = list(map(str.strip, queries))
+    queries_processed = []
+    for query in queries:
+        # Check if query is in the format 'TVSHOW S01E01-05'
+        if re.search('.+ s[0-9][0-9]e[0-9][0-9]-[0-9][0-9]', query, re.IGNORECASE):
+            # Query base (TV show and season)
+            base = re.findall('(.+ s[0-9][0-9]e)[0-9][0-9]-[0-9][0-9]', query, re.IGNORECASE)[0]
+            # Episode numbers that mark the boundaries of our search (E01, E05)
+            start_episode = int(re.findall('.+ s[0-9][0-9]e([0-9][0-9])-[0-9][0-9]', query, re.IGNORECASE)[0])
+            end_episode = int(re.findall('.+ s[0-9][0-9]e[0-9][0-9]-([0-9][0-9])', query, re.IGNORECASE)[0])
+            # For each episode, reconstruct valid query using base + suffix
+            for episode in range(end_episode-start_episode):
+                suffix = start_episode + episode
+                if suffix < 10:
+                    suffix = '0{}'.format(suffix)
+                else: 
+                    suffix = str(suffix)
+                queries_processed.append(base+suffix)
+                
+        # Same as above but now for query in the format 'TVSHOW S01E01-E05'
+        # The difference is in the 'E05' instead of '05'
+        # Both search queries should lead to the same result        
+        elif re.search('.+ s[0-9][0-9]e[0-9][0-9]-e[0-9][0-9]', query, re.IGNORECASE):
+            base = re.findall('(.+ s[0-9][0-9]e)[0-9][0-9]-e[0-9][0-9]', query, re.IGNORECASE)[0]
+            start_episode = int(re.findall('.+ s[0-9][0-9]e([0-9][0-9])-e[0-9][0-9]', query, re.IGNORECASE)[0])
+            end_episode = int(re.findall('.+ s[0-9][0-9]e[0-9][0-9]-e([0-9][0-9])', query, re.IGNORECASE)[0])
+            for episode in range(end_episode-start_episode):
+                suffix = start_episode + episode
+                if suffix < 10:
+                    suffix = '0{}'.format(suffix)
+                else: 
+                    suffix = str(suffix)
+                queries_processed.append(base+suffix)
+        else:
+            queries_processed.append(query)
+    return queries_processed
  
 if __name__=='__main__': main()

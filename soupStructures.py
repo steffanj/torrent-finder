@@ -52,7 +52,8 @@ def EZTV(site, tag, query):
             'title':tag.contents[3].a.text,
             'magnet':tag.contents[5].find_all(class_="magnet")[0]["href"],
             'torrent':tag.contents[5].find_all(class_="download_1")[0]["href"],
-            'size':int(float(tag.contents[7].text.split(' ')[0])),
+            'size':re.findall('([0-9]+\.[0-9]+? [kmgt]b)', tag.contents[7].text,
+                              re.IGNORECASE)[0],
             'age':tag.contents[9].text,
             'seeds':int(tag.contents[11].text),
             'source':site,
@@ -67,12 +68,14 @@ def LEETX(site, tag, query):
     if isRelevant(query, tag.contents[1].text):
         result = {
             'title':tag.contents[1].text,
-            'size':int(float(tag.contents[9].text.split(' ')[0])),
+            'size':re.findall('([0-9]+\.[0-9]+? [kmgt]b)', tag.contents[9].text,
+                              re.IGNORECASE)[0],            
             'age':tag.contents[7].text,
             'seeds':int(tag.contents[3].text),
             'source':site,
             'proper':isProper(tag.contents[1].text)
             }
+
         # The search results link to a separate pages that contain the magnet
         # and torrent links, so these have to be opened and parsed as well
         base_url = 'https://1337x.to'
